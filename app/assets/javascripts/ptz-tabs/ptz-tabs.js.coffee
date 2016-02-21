@@ -30,8 +30,8 @@
 #       | 3
 
 @PtzTabs = do ->
+  # Init once for Turbolinks
   init: ->
-    # Init once for Turbolinks
     @inited ||= do =>
       doc  = $ document
       tabs = '[ptz--tab-id]'
@@ -43,7 +43,9 @@
         tabs_scope = tab.parents('[ptz--tabs-scope]').first().attr('ptz--tabs-scope')
         return false unless tabs_scope
 
-        tab_id        = tab.attr('ptz--tab-id')
+        tab_id = tab.attr('ptz--tab-id')
+        window.location.hash = "ptz--tabs--#{ tabs_scope }--#{ tab_id }"
+
         tabs          = $("[ptz--tabs-scope=#{ tabs_scope }] [ptz--tab-id]")
         atabs         = $("[ptz--tabs-scope=#{ tabs_scope }] [ptz--tab-id=#{ tab_id }]")
         content_items = $("[ptz--tabs-scope=#{ tabs_scope }] [ptz--tab-content]")
@@ -59,3 +61,13 @@
 
         content_items.hide()
         content_item.show()
+
+    # ACTIVATE TAB if need
+    if window.location.hash.length > 0
+      anchor = window.location.hash
+      anchor = anchor.slice(1, anchor.lenght)
+      anchor = anchor.split('ptz--tabs--')
+
+      if anchor.length > 1
+        [scope, id]= anchor[1].split('--')
+        $("[ptz--tabs-scope=#{ scope }] [ptz--tab-id=#{ id }]").click()
